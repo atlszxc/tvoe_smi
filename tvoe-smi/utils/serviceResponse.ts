@@ -1,0 +1,1 @@
+export const serviceResponse = <T>(response: T | null, err: unknown | null) => ({ response, err })

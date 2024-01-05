@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: npm run start:dev
+    env_file:
+      - local.env
+    environment:
+      REDIS_PASSWORD: root
+      REDIS_PORT: 6379
+      REDIS_HOST: redis
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /root/redis
+      - .:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=root
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16

@@ -1,0 +1,534 @@
+openapi: 3.0.3
+info:
+  title: Документация api SMI-NONAME
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8000
+    description: Local-server
+  
+  - url: https://api.2005927-wv18914.twc1.net
+    description: Dev-server
+
+tags: 
+  - name: category
+    description: Api для работы с категориями
+  
+  - name: post
+    description: Api для работы с постами
+
+  - name: tag
+    description: Api для работы с подкатегориями
+
+paths:
+  /category:
+    get:
+      tags:
+        - category
+      summary: Получить категории
+      responses:
+        '200':
+          description: Удачная операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+  
+  /category/{id}:
+    get:
+      tags:
+        - category
+      summary: Получить категорию
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: id категории
+      responses:
+        '200':
+          description: Удачная операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+    delete:
+      tags:
+        - category
+      summary: Удалить категорию
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: id категории
+      responses:
+        '200':
+          description: Удачно удалил
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  
+  /category/create:
+    post:
+      tags:
+        - category
+      summary: Создать категорию
+      requestBody:
+        description: Тело запроса
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: У тебя получилось, даун!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  
+  /post:
+    get:
+      tags:
+        - post
+      summary: Получить все посты
+      responses:
+        '200':
+          description: Отвкт успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posts'
+  /post/create:
+    post:
+      tags:
+        - post
+      summary: Создал пост
+      requestBody:
+        description: Тело запроса
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+
+      responses:
+        '200':
+          description: Успешно создал пост
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+
+  /post/search:
+    get:
+      tags:
+        - post
+      summary: Нашел постыыыыы
+      parameters:
+        - in: query
+          name: searchStr
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posts'
+
+  /post/search/popular:
+    get:
+      tags:
+        - post
+      summary: Получить популярные посты 
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PopularPostResponse'
+  
+  /post/new:
+    get:
+      tags:
+        - post
+      summary: Получить новые новости
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posts'
+  /post/{id}:
+    get:
+      tags:
+        - post
+      summary: Получить пост
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Отвкт успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+    delete:
+      tags:
+        - post
+      summary: Удалить пост
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+
+  /post/category/{categoryId}:
+    get:
+      tags:
+        - post
+      summary: Посты категории
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posts'
+  
+  /post/update/viewscounter/{id}:
+    patch:
+      tags:
+        - post
+      summary: Обновить кол-во просмотров
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ViewsCountResponse'
+  
+  /post/update/{id}:
+    patch:
+      tags:
+        - post
+      summary: Обновить реакцию
+      parameters:
+        - in: query
+          name: reactionId
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Отвкт успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reaction'
+
+  /post/tag/{tagId}:
+    get:
+      tags:
+        - post
+      summary: Получить посты по тегу
+      parameters:
+        - in: path
+          name: tagId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Posts'
+  
+  /tag:
+    get:
+      tags:
+        - tag
+      summary: Получить теги
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tags'
+  
+  /tag/{categoryId}:
+    get:
+      tags:
+        - tag
+      summary: Получить подкатегории категории
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Отвкт успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tags'
+  
+  /tag/create:
+    post:
+      tags:
+        - tag
+      summary: Создать подкатегорию
+      requestBody:
+        description: Тело запроса
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+      responses:
+        '201':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+  
+  /tag/{id}:
+    delete:
+      tags:
+        - tag
+      summary: Удалить подкатегорию
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Ответ успеха
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+
+
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id категории
+        title: 
+          type: string
+          description: Название категории
+    
+    CategoriesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+
+    
+    ViewsCountResponse:
+      type: object
+      properties:
+        viewsCount:
+          type: integer
+          format: int64
+          example: 10
+    
+    Reaction:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Мок название, будет меняться на картинку
+        count:
+          type: integer
+          format: int64
+          example: 10
+    
+    CreateTagRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+          format: uuid
+
+    Tag:
+      type: object
+      properties:
+        _id:
+          type: string
+        title: 
+          type: string
+        category:
+          type: string
+    
+    Tags:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+      
+    TagTitle:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: 'Id подкатегории'
+        title:
+          type: string 
+          description: 'Название подкатегории'
+
+    CreateCategoryRequest:
+      type: object
+      properties:
+        title:
+          type: string 
+          description: 'Названиекатегории'
+    
+    CategoryTitle:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: 'Id категории'
+
+        title:
+          type: string 
+          description: 'Названиекатегории'
+    
+    CreatePostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          format: uuid
+        content:
+          type: string
+        img:
+          type: string
+          format: binary
+        category:
+          type: string
+          format: uuid
+        tag:
+          type: string
+          format: uuid
+        isPublished:
+          type: boolean
+    
+    PostResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+          description: Название поста
+        content:
+          type: string
+          description: Текст поста
+        img:
+          type: string
+          description: Путь до картинки в облаке
+        category:
+          $ref: '#/components/schemas/CategoryTitle'
+        tag:
+         $ref: '#/components/schemas/CategoryTitle'
+        isPublished:
+          type: boolean
+          description: Опубликован или не опубликован пост
+        viewsCount:
+          type: integer
+          format: int64
+          example: 10
+        reactions:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Reaction'
+    
+    PopularPost:
+      type: object
+      properties:
+        _id: 
+          type: string
+        title:
+          type: string
+        viewsCount:
+          type: integer
+          format: int64
+          example: 10
+    
+    PopularPostResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/PopularPost'
+    
+    Posts:
+      type: array
+      items:
+        $ref: '#/components/schemas/PostResponse'
+
+
